@@ -1,14 +1,15 @@
+const DB = require("../db/user");
+const { msg } = require("../utlis/helper");
+
 const all = async (req, res, next) => {
-  res.json({
-    msg: `All Users`,
-  });
+  let users = await DB.find();
+  msg(res, "success", users);
 };
 
 const post = async (req, res, next) => {
-  res.json({
-    msg: `Create User`,
-    data: req.body,
-  });
+  const newUser = new DB(req.body);
+  const result = await newUser.save();
+  msg(res, "success", result);
 };
 
 const get = async (req, res, next) => {
