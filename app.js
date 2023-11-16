@@ -22,14 +22,10 @@ const connect = async () => {
 
 connect();
 
-const funky = (req, res, next) => {
-  res.json({
-    msg: "Comming with Get method",
-  });
-};
 
 const isLogged = (req, res, next) => {
-  if (1 + 1 == 3) {
+  if (1 + 1 == 2) {
+    req.successMsg = "We are good to go";
     next();
   } else {
     next(new Error("You are not logged in"));
@@ -38,11 +34,22 @@ const isLogged = (req, res, next) => {
 
 const isAdmin = (req, res, next) => {
   if (4 == 4) {
+    console.log(req.successMsg);
+    req.warningMsg = "We are warning";
     next();
   } else {
     next(new Error("Only Admin can access this route."));
   }
 };
+
+const funky = (req, res, next) => {
+  res.json({
+    msg: "Comming with Get method",
+    success: req.successMsg,
+    warning: req.warningMsg
+  });
+};
+
 
 app.get("/users", isLogged, isAdmin, funky);
 // app.use("/users", userRoute);
