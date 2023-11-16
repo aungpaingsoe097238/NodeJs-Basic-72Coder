@@ -1,6 +1,9 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
 const express = require("express");
+const userRoute = require("./routes/user");
+const postRoute = require("./routes/post");
+
 const app = express();
 app.use(express.json());
 
@@ -19,10 +22,30 @@ const connect = async () => {
 
 connect();
 
-const userRoute = require("./routes/user");
-const postRoute = require("./routes/post");
+const funky = (req, res, next) => {
+  res.json({
+    msg: "Comming with Get method",
+  });
+};
 
-app.use("/users", userRoute);
+const isLogged = (req, res, next) => {
+  if (1 + 1 == 3) {
+    next();
+  } else {
+    next(new Error("You are not logged in"));
+  }
+};
+
+const isAdmin = (req, res, next) => {
+  if (4 == 4) {
+    next();
+  } else {
+    next(new Error("Only Admin can access this route."));
+  }
+};
+
+app.get("/users", isLogged, isAdmin, funky);
+// app.use("/users", userRoute);
 app.use("/posts", postRoute);
 
 // Error Handling
