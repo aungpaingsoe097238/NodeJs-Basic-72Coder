@@ -4,10 +4,10 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-// MongoDb Url
-const url = "mongodb+srv://admin:adminpass@cluster0.45swmim.mongodb.net/node-syntax?retryWrites=true&w=majority"
+// MongoDB Url
+const url = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.45swmim.mongodb.net/${process.env.DB_NAME}`;
 
-// Check MongoDb Connections
+// Check MongoDB Connections
 const connect = async () => {
   try {
     await mongoose.connect(url);
@@ -24,6 +24,15 @@ const postRoute = require("./routes/post");
 
 app.use("/users", userRoute);
 app.use("/posts", postRoute);
+
+// Error Handling
+app.use((err, req, res, next) => {
+  err.status = err.status || 200;
+  res.status(err.status).json({
+    con: false,
+    msg: err.message,
+  });
+});
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running at Port ${process.env.PORT}`);

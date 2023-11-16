@@ -13,22 +13,26 @@ const post = async (req, res, next) => {
 };
 
 const get = async (req, res, next) => {
-  res.json({
-    msg: `Get User ${req.params.id}`,
-  });
+  const user = await DB.findById(req.params.id);
+  msg(res, "success", user);
 };
 
 const patch = async (req, res, next) => {
-  res.json({
-    msg: `Update User ${req.params.id}`,
-    data: req.body,
-  });
+  const user = await DB.findById(req.params.id);
+  if (user) {
+    await DB.findByIdAndUpdate(user._id, req.body);
+    let updateUser = await DB.findById(user._id);
+    msg(res, "success", updateUser);
+  } else {
+    const error = new Error("User not found.");
+    error.status = 500; // You can set the status code for the error
+    next(error);
+  }
 };
 
 const drop = async (req, res, next) => {
-  res.json({
-    msg: `Delete User ${req.params.id}`,
-  });
+  await DB.findByIdAndDelete(req.params.id);
+  msg(res, "success");
 };
 
 module.exports = {

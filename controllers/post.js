@@ -1,33 +1,38 @@
+const DB = require("../db/post");
+const { msg } = require("../utlis/helper");
+
 const all = async (req, res, next) => {
-  res.json({
-    msg: `All Posts`,
-  });
+  const posts = await DB.find();
+  msg(res, "success", posts);
 };
 
 const post = async (req, res, next) => {
-  res.json({
-    msg: `Create Post`,
-    data: req.body,
-  });
+  const newPost = new DB(req.body);
+  const result = await newPost.save();
+  msg(res, "success", result);
 };
 
 const get = async (req, res, next) => {
-  res.json({
-    msg: `Get Post ${req.params.id}`,
-  });
+  const post = await DB.findById(req.params.id);
+  msg(res, "success", post);
 };
 
 const patch = async (req, res, next) => {
-  res.json({
-    msg: `Update Post ${req.params.id}`,
-    data: req.body
-  });
+  const post = await DB.findById(req.params.id);
+  if (post) {
+    await DB.findByIdAndUpdate(post._id, req.body);
+    let updatePost = await DB.findById(post._id);
+    msg(res, "success", updatePost);
+  } else {
+    const error = new Error("Post not found.");
+    error.status = 500; // You can set the status code for the error
+    next(error);
+  }
 };
 
 const drop = async (req, res, next) => {
-  res.json({
-    msg: `Delete Post ${req.params.id}`,
-  });
+  await DB.findByIdAndDelete(req.params.id);
+  msg(res, "success");
 };
 
 module.exports = {
