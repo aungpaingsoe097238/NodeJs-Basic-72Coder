@@ -2,7 +2,7 @@ const DB = require("../db/post");
 const { msg } = require("../utlis/helper");
 
 const all = async (req, res, next) => {
-  const posts = await DB.find();
+  const posts = await DB.find().populate("user","-password -__v");
   msg(res, "success", posts);
 };
 
@@ -13,7 +13,7 @@ const post = async (req, res, next) => {
 };
 
 const get = async (req, res, next) => {
-  const post = await DB.findById(req.params.id);
+  const post = await DB.findById(req.params.id,"-__v").populate("user","-password -__v");
   msg(res, "success", post);
 };
 
