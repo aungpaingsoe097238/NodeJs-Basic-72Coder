@@ -7,16 +7,26 @@ const all = async (req, res, next) => {
 };
 
 const add = async (req, res, next) => {
-  const findCategory = await DB.findOne({ name : req.body.name });
-  if(findCategory){
-    next(new Error("This category is already exit"))
+  const findCategory = await DB.findOne({ name: req.body.name });
+  if (findCategory) {
+    next(new Error("This category is already exit"));
     return;
   }
   const category = await new DB(req.body).save();
   msg(res, "success", category);
 };
 
+const get = async (req, res, next) => {
+  const category = await DB.findById(req.params.id);
+  if (!category) {
+    next(new Error("Can't find category."));
+    return;
+  }
+  msg(res, "success", category);
+};
+
 module.exports = {
   all,
   add,
+  get,
 };

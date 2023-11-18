@@ -6,5 +6,12 @@ module.exports = {
       name: Joi.string().required(),
       image: Joi.string().required(),
     }),
+    allSchema: {
+      id: Joi.object({
+        id: Joi.string()
+          .regex(/^[0-9a-fA-F]{24}$/)
+          .required(),
+      }),
+    },
   },
 };
