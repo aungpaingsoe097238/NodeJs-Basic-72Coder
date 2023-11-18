@@ -5,7 +5,7 @@ const saveFile = (req, res, next) => {
   const file = req.files.file;
   const filename = new Date().valueOf() + "_" + file.name;
   file.mv(`./uploads/${filename}`);
-  req.image = filename;
+  req.body.image = filename;
   next();
 };
 
@@ -18,13 +18,13 @@ const saveFiles = (req, res, next) => {
     file.mv(`./uploads/${filename}`);
     filenames.push(filename);
   });
-  req.images = filenames;
+  req.body.images = filenames;
   next();
 };
 
 // File Deleting
-const deleteFile = async (filename) => {
-  await fs.unlinkSync(`./uploads/${filename}`);
+const deleteFile = (filename) => {
+  fs.unlinkSync(`./uploads/${filename}`);
 };
 
 module.exports = { saveFile, saveFiles, deleteFile };
