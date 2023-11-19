@@ -13,7 +13,7 @@ app.use(fileUpload());
 // Database Connection
 connect();
 
-app.use("/users", userRoute);
+app.use("/", userRoute);
 app.use("/categories", categoryRoute);
 app.use("/posts", postRoute);
 

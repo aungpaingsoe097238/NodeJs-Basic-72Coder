@@ -1,44 +1,49 @@
 const DB = require("../models/user");
-const { msg } = require("../utlis/helper");
+const { msg, encode, compare, generateToken } = require("../utlis/helper");
 
-const all = async (req, res, next) => {
-  let users = await DB.find();
-  msg(res, "success", users);
-};
+const register = async (req, res, next) => {
+  const findName = await DB.findOne({ name: req.body.name });
+  if (findName) {
+    next(new Error("Name is already exit."));
+    return;
+  }
 
-const post = async (req, res, next) => {
-  const newUser = new DB(req.body);
-  const result = await newUser.save();
-  msg(res, "success", result);
-};
+  const findEmail = await DB.findOne({ email: req.body.email });
+  if (findEmail) {
+    next(new Error("Email is alerady exit."));
+    return;
+  }
 
-const get = async (req, res, next) => {
-  const user = await DB.findById(req.params.id);
+  const findPhone = await DB.findOne({ phone: req.body.phone });
+  if (findPhone) {
+    next(new Error("Phone is alerady exit"));
+    return;
+  }
+
+  req.body.password = encode(req.body.password);
+  const user = await new DB(req.body).save();
   msg(res, "success", user);
 };
 
-const patch = async (req, res, next) => {
-  const user = await DB.findById(req.params.id);
-  if (user) {
-    await DB.findByIdAndUpdate(user._id, req.body);
-    let updateUser = await DB.findById(user._id);
-    msg(res, "success", updateUser);
+const login = async (req, res, next) => {
+  const user = await DB.findOne({ phone : req.body.phone }).select("-__v");
+  if(!user){
+    next(new Error("Invalid Credential."));
+    return ;
+  }
+  const comparePassword = compare( req.body.password, user.password )  
+  if(!comparePassword){
+    next(new Error("Invalid Credential."));
+    return;
   } else {
-    const error = new Error("User not found.");
-    error.status = 500; // You can set the status code for the error
-    next(error);
+    let loginUser = user.toObject();
+    delete loginUser.password;
+    loginUser.token  = generateToken(loginUser);
+    msg(res,'success',loginUser);
   }
 };
 
-const drop = async (req, res, next) => {
-  await DB.findByIdAndDelete(req.params.id);
-  msg(res, "success");
-};
-
 module.exports = {
-  all,
-  post,
-  get,
-  patch,
-  drop,
+  register,
+  login,
 };

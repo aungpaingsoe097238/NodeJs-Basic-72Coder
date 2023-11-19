@@ -1,8 +1,9 @@
 const router = require("express").Router();
-const { all, post, get, patch, drop } = require("../controllers/user");
+const { register, login } = require("../controllers/user");
+const { Schema } = require("../utlis/Schema");
+const { ValidateBody } = require("../utlis/validator");
 
-router.get("/", all);
-router.post("/", post);
-router.route("/:id").get(get).patch(patch).delete(drop);
+router.post("/login", [ValidateBody(Schema.LoginSchema), login]);
+router.post("/register", [ValidateBody(Schema.RegisterSchema), register]);
 
 module.exports = router;
