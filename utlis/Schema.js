@@ -12,6 +12,9 @@ module.exports = {
           .regex(/^[0-9a-fA-F]{24}$/)
           .required(),
       }),
+      image: Joi.object({
+        image: Joi.string().required(),
+      }),
     },
   },
 };
