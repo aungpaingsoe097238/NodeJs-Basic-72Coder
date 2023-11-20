@@ -7,8 +7,10 @@ const all = async (req, res, next) => {
 };
 
 const post = async (req, res, next) => {
-  const newPost = new DB(req.body);
-  const result = await newPost.save();
+  let userId = req.body.user._id;
+  delete req.body.user;
+  req.body.user = userId;
+  let result = await new DB(req.body).save();
   msg(res, "success", result);
 };
 
