@@ -1,8 +1,9 @@
 const DB = require("../models/post");
+const commentDB = require("../models/comment");
 const { msg } = require("../utlis/helper");
 
 const all = async (req, res, next) => {
-  const posts = await DB.find().populate("user","-password -__v");
+  const posts = await DB.find().populate("user category", "-password -__v");
   msg(res, "success", posts);
 };
 
@@ -15,7 +16,13 @@ const post = async (req, res, next) => {
 };
 
 const get = async (req, res, next) => {
-  const post = await DB.findById(req.params.id,"-__v").populate("user","-password -__v");
+  let post = await DB.findById(req.params.id, "-__v").populate(
+    "user",
+    "-password -__v"
+  );
+  let comments =  await commentDB.find({ postId : post._id });
+  post = post.toObject();
+  post['comments'] = comments;
   msg(res, "success", post);
 };
 
@@ -37,10 +44,44 @@ const drop = async (req, res, next) => {
   msg(res, "success");
 };
 
+const by_category = async (req, res, next) => {
+  const posts = await DB.find({
+    category: req.params.id,
+  }).populate("user category");
+  msg(res, "success", posts);
+};
+
+const by_user = async (req, res, next) => {
+  const posts = await DB.find({
+    user: req.params.id,
+  }).populate("user category");
+  msg(res, "success", posts);
+};
+
+const by_tag = async (req, res, next) => {
+  const posts = await DB.find({
+    tag: req.params.id,
+  }).populate("tag");
+  msg(res, "success", posts);
+};
+
+const paginate = async (req, res, next) => {
+  let page = req.params.page;
+  page = page == 1 ? 0 : page - 1;
+  let limit = Number(process.env.POST_LIMIT);
+  let skipCount = limit * page;
+  let posts = await DB.find().skip(skipCount).limit(limit);
+  msg(res, "success", posts);
+};
+
 module.exports = {
   all,
   post,
   get,
   patch,
   drop,
+  by_category,
+  by_user,
+  by_tag,
+  paginate,
 };

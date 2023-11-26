@@ -2,8 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const userRoute = require("./routes/user");
+const tagRoute = require("./routes/tag");
 const categoryRoute = require("./routes/category");
 const postRoute = require("./routes/post");
+const commentRoute = require("./routes/comment");
 const { connect } = require("./models/connection");
 
 const app = express();
@@ -14,8 +16,10 @@ app.use(fileUpload());
 connect();
 
 app.use("/", userRoute);
+app.use("/tags", tagRoute);
 app.use("/categories", categoryRoute);
 app.use("/posts", postRoute);
+app.use("/comments", commentRoute);
 
 // Error Handling
 app.use((err, req, res, next) => {
